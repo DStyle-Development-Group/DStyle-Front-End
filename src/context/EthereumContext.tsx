@@ -20,8 +20,7 @@ const EthereumProvider = ({ children }: { children: ReactNode }) => {
 	const [walletConnected, setWalletConnected] = useState(false)
 	const [account, setAccount] = useState('')
 	const [signer, setSigner] = useState<providers.JsonRpcSigner>()
-	const [signature, setSignature] = useState<string | undefined>(undefined)
-	const [token, setToken] = useState('')
+	const [token, setToken] = useState('') // eventually move to separate context
 	const [statusMessage, setStatusMessage] = useState('')
 
 	useEffect(() => {
@@ -51,7 +50,10 @@ const EthereumProvider = ({ children }: { children: ReactNode }) => {
 				account,
 				'Sign in with Ethereum wallet'
 			)
-			console.log(await signer?.signMessage(message))
+			const signature = await (
+				signer as providers.JsonRpcSigner
+			).signMessage(message)
+			await getToken(signature)
 		} catch (err) {
 			setStatusMessage(`Error signing in: ${err}`)
 		}
@@ -70,6 +72,27 @@ const EthereumProvider = ({ children }: { children: ReactNode }) => {
 			chainId: 1
 		})
 		return message.prepareMessage()
+	}
+
+	// todo - is there anon way to ensure eth accounts are owned by unique real people?
+	// todo - if new eth address, verify/create new user
+	// todo - figure out way to prevent DDOS (maybe just time delay + animation while receiving token?)
+	async function getToken(signedMessage: string): Promise<void> {
+		const response = await fetch('https://example.com/api/login', {
+			method: 'POST',
+			body: JSON.stringify({
+				signature: signedMessage
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+		if (!response.ok) {
+			setStatusMessage(`${response.status} ${response.statusText}`)
+		} else {
+			const data = await response.json()
+			setToken(data.token)
+		}
 	}
 
 	const value = {

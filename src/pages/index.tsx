@@ -2,7 +2,7 @@ import { Card } from '@/components/layout/Card'
 import { SIWE } from '@/components/SIWE'
 import { ConnectUserWallet } from '@/components/connectUserWallet'
 import Image from 'next/image'
-import { metamaskDownloadLink } from '@/constants'
+import { METAMASK_DOWNLOAD_URL } from '@/constants'
 
 export default function Page() {
 	return (
@@ -31,7 +31,7 @@ export default function Page() {
 					<h2 className="text-2xl">New to Ethereum?</h2>
 					<p>Install Metamask to get started</p>
 					<a
-						href={metamaskDownloadLink}
+						href={METAMASK_DOWNLOAD_URL}
 						className="flex flex-col items-center p-4 bg-violet-700 rounded-lg m-2"
 					>
 						<Image

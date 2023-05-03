@@ -1,1 +1,1 @@
-export const metamaskDownloadLink = 'https://metamask.io/download/'
+export const METAMASK_DOWNLOAD_URL = 'https://metamask.io/download/'
