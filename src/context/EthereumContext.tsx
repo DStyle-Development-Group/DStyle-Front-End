@@ -1,7 +1,17 @@
-import { IEthereumContext } from '@/Interfaces/interfaces'
 import { ReactNode, createContext, useEffect, useState } from 'react'
 import { providers } from 'ethers'
 import { SiweMessage } from 'siwe'
+
+export interface IEthereumContext {
+	ethereumEnabled: boolean
+	provider: providers.Web3Provider | undefined
+	walletConnected: boolean
+	signer: providers.JsonRpcSigner | undefined
+	account: string | undefined
+	statusMessage: string
+	connectWallet: (() => Promise<void>) | undefined
+	signInWithEthereum: (() => Promise<void>) | undefined
+}
 
 export const EthereumContext = createContext<IEthereumContext>({
 	ethereumEnabled: false,
@@ -46,13 +56,10 @@ const EthereumProvider = ({ children }: { children: ReactNode }) => {
 
 	async function signInWithEthereum() {
 		try {
-			const message = createSiweMessage(
-				account,
-				'Sign in with Ethereum wallet'
+			const message = createSiweMessage(account, 'Sign in with Ethereum wallet')
+			const signature = await (signer as providers.JsonRpcSigner).signMessage(
+				message
 			)
-			const signature = await (
-				signer as providers.JsonRpcSigner
-			).signMessage(message)
 			await getToken(signature)
 		} catch (err) {
 			setStatusMessage(`Error signing in: ${err}`)
